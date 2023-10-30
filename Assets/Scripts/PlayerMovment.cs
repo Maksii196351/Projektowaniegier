@@ -72,7 +72,7 @@ public class PlayerMovment : MonoBehaviour
 		var dashInput = Input.GetButtonDown("Dash");
 		if (dashInput && _canDash)
 		{
-            CG.enabled = false;
+            //CG.enabled = false;
             rb.gravityScale = 0;
 			_canDash = false;
 			_isDashing = true;
@@ -108,7 +108,7 @@ public class PlayerMovment : MonoBehaviour
     {
 		yield return new WaitForSeconds(_dashingTime);
 		rb.gravityScale = 4f;
-        CG.enabled = true;
+        //CG.enabled = true;
 		_trailRenderer.emitting = false;
 		_isDashing = false;		
 	}
