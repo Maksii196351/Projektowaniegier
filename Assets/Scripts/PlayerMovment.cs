@@ -1,15 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using JetBrains.Rider.Unity.Editor;
-using Unity.VisualScripting;
+
+
+
 using UnityEngine;
-using UnityEngine.UIElements;
-//dodanie braku kolizji podczas dash
-//dodanie życia
+
+
 public class PlayerMovment : MonoBehaviour
 {
-
+priva
         private float horizontal;
         
         private float Speed = 8f;
@@ -22,7 +20,7 @@ public class PlayerMovment : MonoBehaviour
     [SerializeField]        private Transform groundCheck;
     [SerializeField]        private LayerMask groundLayer;    
     [SerializeField]        private CapsuleCollider2D CG;
-    [SerializeField]        private int hp = 3;
+    
    [Header("dashing")]
     [SerializeField]    private float _dashingVelocity = 24f;
     [SerializeField]    private float _dashingTime = 0.1f;
@@ -30,8 +28,13 @@ public class PlayerMovment : MonoBehaviour
 	private bool _isDashing;
 	private bool _canDash = true;
     private Vector2 _moveInput;
-  
+    private Vector2 _lastInputDirection;
 	private TrailRenderer _trailRenderer;    
+    [Header("Wallslide")]
+    [SerializeField] private Transform _wallCheck:
+    [SerializeField]
+    private bool _isWallSliding;
+    private float _SlideSpeed = 2f;
     void Start()
     {
         _trailRenderer = GetComponent<TrailRenderer>();
@@ -39,6 +42,9 @@ public class PlayerMovment : MonoBehaviour
     }
     void Update()
     {
+        {
+  _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); //dodaj tę linijkę na początku update
+}
         
         var inputX = Input.GetAxisRaw("Horizontal");
         var JumpInput  = Input.GetButtonDown("Vertical");
@@ -47,6 +53,10 @@ public class PlayerMovment : MonoBehaviour
         if (JumpInput && isGrounded())
         {
             rb.velocity = new Vector2(rb.velocity.x, JumpPower);
+        }
+        if (Input.GetButtonUp("Vertical") && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
 
         if (inputX != 0)
@@ -78,7 +88,7 @@ public class PlayerMovment : MonoBehaviour
 		if (_isDashing)
 		{
 			
-			rb.velocity = _dashingDir * _dashingVelocity;
+			rb.velocity = _lastInputDirection * _dashingVelocity;
 			return;
 		}
 		if (isGrounded())
@@ -102,6 +112,13 @@ public class PlayerMovment : MonoBehaviour
     {
         return Physics2D.OverlapCircle(groundCheck.position, _groundCheckSize, groundLayer);
     }    
+    private void LateUpdate() //to jest metoda która wykonuje się trochę póżniej po Update()
+{
+  if(_moveInput != Vector2.zero)
+  {
+    _lastInputDirection = _moveInput; //ustawiasz lastInputDirection na moveInput tylko wtedy kiedy nie równa się 0
+  }
+}
 
 }
 
