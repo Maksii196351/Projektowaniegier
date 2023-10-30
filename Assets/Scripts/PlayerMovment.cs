@@ -1,19 +1,15 @@
 using System.Collections;
-
-
-
 using UnityEngine;
-
 
 public class PlayerMovment : MonoBehaviour
 {
-priva
+
         private float horizontal;
         
         private float Speed = 8f;
         private float JumpPower = 16f;
 
-        private bool isFacingRight = true;
+        private bool _isFacingRight = true;
         private float _groundCheckSize = 0.05f;
        
     [SerializeField]        private Rigidbody2D rb;
@@ -31,10 +27,17 @@ priva
     private Vector2 _lastInputDirection;
 	private TrailRenderer _trailRenderer;    
     [Header("Wallslide")]
-    [SerializeField] private Transform _wallCheck:
-    [SerializeField]
+    [SerializeField] private Transform _wallCheck;
+    [SerializeField] private LayerMask wallslidelayer;
     private bool _isWallSliding;
     private float _SlideSpeed = 2f;
+    [Header("WallJump")]
+    private bool _isWallJumping;
+    private float _wallJumpingDir; 
+    private float _wallJumpingTime = 0.2f;
+    private float _wallJumpingCounter;
+    private float _walljumpingDur = 0.4f;
+    private Vector2 _wallJumpPower = new Vector2(8f,16f);
     void Start()
     {
         _trailRenderer = GetComponent<TrailRenderer>();
@@ -43,8 +46,8 @@ priva
     void Update()
     {
         {
-  _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); //dodaj tę linijkę na początku update
-}
+        _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); 
+        }
         
         var inputX = Input.GetAxisRaw("Horizontal");
         var JumpInput  = Input.GetButtonDown("Vertical");
@@ -96,7 +99,8 @@ priva
 			_canDash = true;
 		}
 		
-		                       
+		isWallSlidding();        
+        //WallJump();
 
     }
 
@@ -119,6 +123,55 @@ priva
     _lastInputDirection = _moveInput; //ustawiasz lastInputDirection na moveInput tylko wtedy kiedy nie równa się 0
   }
 }
+private bool isWalled()
+{
+    return Physics2D.OverlapCircle(_wallCheck.position,0.2f, wallslidelayer);
+}
+private void isWallSlidding()
+{
+    if (isWalled() && !isGrounded() && horizontal != 1f)
+    {
+        _isWallSliding = true;
+        
+        rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -_SlideSpeed, float.MaxValue));
+    }
+    else
+    {
+        _isWallSliding = false;
+    }
+}
+//private void WallJump()
+//{
+//    var inputX = Input.GetAxisRaw("Horizontal");
+//    if (_isWallSliding)
+//    {
+//        _isWallJumping = false;
+//        _wallJumpingDir = -transform.localScale.x;
+//        _wallJumpingCounter = _wallJumpingTime; 
+//        CancelInvoke(nameof(StopWallJumping));
+//    }
+//    else
+//    {
+//        _wallJumpingCounter -= Time.deltaTime;
+//    }
+//    if (Input.GetButtonDown("Vertical") && _wallJumpingCounter > 0f)
+//    {
+//        _isWallJumping = true;
+ //       rb.velocity = new Vector2(_wallJumpingDir * _wallJumpPower.x, _wallJumpPower.y);
+ //       _wallJumpingCounter = 0f;
+//
+ //       if (transform.localScale.x != _wallJumpingDir) 
+ //       {
+ //           transform.localScale = new Vector3(Mathf.Sign(-inputX), 1, 1);
+  //      }
+ //       Invoke(nameof(StopWallJumping), _walljumpingDur);
+ //   }   
+//}
+//private void StopWallJumping()
+ //   {
+ //       _isWallJumping = false;
+ //   }
+
 
 }
 
