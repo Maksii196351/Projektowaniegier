@@ -51,7 +51,7 @@ public class PlayerMovment : MonoBehaviour
         isWallSlidding();        
         WallJump();
      
-      
+        //dasj
 		var dashInput = Input.GetButtonDown("Dash");
 		if (dashInput && _canDash)
 		    {
@@ -88,6 +88,11 @@ public class PlayerMovment : MonoBehaviour
 
     private void Move()
     {
+        if (_isDashing)
+        {
+            return;
+        }
+
         if(!isWalled())
         {
             _moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); 
